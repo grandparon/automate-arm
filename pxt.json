@@ -1,5 +1,5 @@
 {
-    "name": "Automate Arm",
+    "name": "Automate Arm v1",
     "description": "",
     "dependencies": {
         "core": "*",

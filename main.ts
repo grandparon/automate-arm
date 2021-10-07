@@ -1,20 +1,17 @@
 input.onButtonPressed(Button.A, function () {
-    arminandup()
+	
 })
 function MoveServo (num: number, num2: number, num3: number) {
     ServoBit.moveServo(num, num2, num3)
 }
 input.onButtonPressed(Button.AB, function () {
-    if (toggle == 0) {
-        angle = -80
-        toggle = 1
-    } else {
-        angle = 80
-        toggle = 0
-    }
+    ServoBit.moveServo(0, 90, 60)
+    ServoBit.moveServo(1, 90, 60)
+    ServoBit.moveServo(2, -90, 60)
+    ServoBit.moveServo(3, 90, 60)
 })
 input.onButtonPressed(Button.B, function () {
-    armdownandout()
+	
 })
 function armdownandout () {
     MoveServo(inoutservonum, arm_out, speed_1)
@@ -23,22 +20,18 @@ function armdownandout () {
 }
 function arminandup () {
     servo_current_pos = ServoBit.getServoActual(armin)
-    MoveServo(inoutservonum, armin, speed_1)
-    MoveServo(updownservonum, armup, speed_1)
-    MoveServo(clawservonum, clawopen, speed_1)
 }
 function ServoToZero (num: number) {
     ServoBit.moveServo(0, 0, 80)
     ServoBit.waitServo(0)
 }
+function read_keyboard (num: number) {
+	
+}
 let servo_current_pos = 0
-let angle = 0
-let toggle = 0
 let speed_1 = 0
 let speed_2 = 0
-let clawopen = 0
 let clawclosed = 0
-let armup = 0
 let armdown = 0
 let armin = 0
 let arm_out = 0
@@ -49,15 +42,17 @@ updownservonum = 1
 inoutservonum = 2
 clawservonum = 3
 ServoBit.centreServos()
-arm_out = 70
-armin = -70
+arm_out = 85
+armin = -35
 armdown = -70
-armup = 70
+let armup = 70
 clawclosed = -80
-clawopen = 80
+let clawopen = 80
 let speed_3 = 300
 speed_2 += 200
 speed_1 = 100
+// reads keyboard
+// 
 basic.forever(function () {
     basic.clearScreen()
     // P0 col with zero at bottom
@@ -100,4 +95,12 @@ basic.forever(function () {
     // P0 col with zero at bottom
     pins.digitalWritePin(DigitalPin.P16, 0)
     basic.clearScreen()
+    while (input.buttonIsPressed(Button.B)) {
+        MoveServo(inoutservonum, ServoBit.getServoActual(inoutservonum) + 5, speed_1)
+        basic.pause(50)
+    }
+    while (input.buttonIsPressed(Button.A)) {
+        MoveServo(inoutservonum, ServoBit.getServoActual(inoutservonum) - 5, speed_1)
+        basic.pause(50)
+    }
 })
