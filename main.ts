@@ -1,50 +1,13 @@
-/**
- * In-out servo limits are 0 to -35
- */
-function MoveServo (num: number, num2: number, num3: number) {
-    ServoBit.moveServo(num, num2, num3)
-    ServoBit.waitServo(num)
-}
-function show_servo_number (num: number) {
-    basic.showNumber(ServoBit.getServoActual(num))
-    basic.pause(200)
-}
-function servo_test (num: number) {
-    if (num == 0) {
-        MoveServo(num, 45, speed_1)
-        show_servo_number(0)
-        MoveServo(num, -45, speed_1)
-        show_servo_number(0)
-        MoveServo(num, 0, speed_1)
-        return 1
-    } else if (num == 1) {
-        MoveServo(1, 0, speed_1)
-        show_servo_number(num)
-        MoveServo(1, -35, speed_1)
-        show_servo_number(num)
-        MoveServo(num, 0, speed_1)
-        return 1
-    } else if (num == 2) {
-        MoveServo(num, 60, speed_1)
-        show_servo_number(0)
-        MoveServo(num, 30, speed_1)
-        show_servo_number(0)
-        MoveServo(num, 0, speed_1)
-        return 1
-    } else if (num == 3) {
-        MoveServo(num, 45, speed_1)
-        show_servo_number(num)
-        MoveServo(num, -45, speed_1)
-        show_servo_number(num)
-        MoveServo(num, 0, speed_1)
-        return 1
+function Check_Keyboard (num: number) {
+    while (num == 1) {
+        basic.showNumber(read_keyboard())
+        basic.pause(100)
+        basic.clearScreen()
     }
-    basic.showIcon(IconNames.No)
-    return 99
 }
-function arminandup () {
-    let armin = 0
-    servo_current_pos = ServoBit.getServoActual(armin)
+function MoveServo (servo_num: number, how_far: number, how_fast: number) {
+    ServoBit.moveServo(servo_num, how_far, how_fast)
+    ServoBit.waitServo(servo_num)
 }
 // There are 12 keys on this 12 keys on this keypad.. We need numbers for the '*' key and the '#' key.
 // '*'  will be 10
@@ -54,6 +17,10 @@ function arminandup () {
 function read_keyboard () {
     // P0 col with zero at bottom
     pins.digitalWritePin(DigitalPin.P0, 1)
+    // P0 col with zero at bottom
+    pins.digitalWritePin(DigitalPin.P16, 0)
+    // P0 col with zero at bottom
+    pins.digitalWritePin(DigitalPin.P8, 0)
     // P1 row with the 4 on it 
     // P1
     // P1
@@ -64,8 +31,6 @@ function read_keyboard () {
     } else if (pins.digitalReadPin(DigitalPin.P12) == 1) {
         return 8
     } else if (pins.digitalReadPin(DigitalPin.P13) == 1) {
-        // P0 col with zero at bottom
-        pins.digitalWritePin(DigitalPin.P13, 1)
         return 0
     }
     // P0 col with zero at bottom
@@ -89,68 +54,67 @@ function read_keyboard () {
     pins.digitalWritePin(DigitalPin.P8, 1)
     // P1 row with the 4 on it 
     if (pins.digitalReadPin(DigitalPin.P1) == 1) {
-        return 3
-    } else if (pins.digitalReadPin(DigitalPin.P2) == 1) {
         return 6
+    } else if (pins.digitalReadPin(DigitalPin.P2) == 1) {
+        return 3
     } else if (pins.digitalReadPin(DigitalPin.P12) == 1) {
         return 9
-    } else if (pins.digitalReadPin(DigitalPin.P2) == 1) {
+    } else if (pins.digitalReadPin(DigitalPin.P13) == 1) {
         // same as # key
-        return 12
+        return 11
     }
     // P0 col with zero at bottom
     pins.digitalWritePin(DigitalPin.P8, 0)
-    return 98
+    return 99
 }
-let servo_current_pos = 0
-let speed_1 = 0
 // the numbers on the right side of each of these needs to be the same as the slot or connector number on the micro-bit motor board.
 // Example is the servo that rotates the arm has a variable called rotate-servo-num. It has the value 0. So the rotate servo needs to be plugged into the "0" pins on the motor board.
-let rotateservonum = 0
-let updownservonum = 1
-let inoutservonum = 2
-let clawservonum = 3
+let RotateNum = 0
+let UpDnNum = 1
+let InOutNum = 2
+let ClawNum = 3
 let speed_3 = 300
-let speed_2 = 100
-speed_1 = 100
+let speed_2 = 200
+let speed_1 = 100
 ServoBit.centreServos()
-let claw_opening = 5
-let clawclosing = 2
-let rotate_arm_clockwise = 1
-let rotate_arm_counterclockwise = 4
+// this is the key board number assigned to open claw. It can be changed of you want a different key to open claw.
+// This is the same for all the  arm commands , like ROTATE CLOCKWISE. 
+// If you want to make ROTATE to be key 2 for example you would set ROTATE CLOCKWISE to 2.
+let ClawOpen = 5
+let ClawClose = 2
+let ROTATE_CW = 1
+let RotCCW = 4
+let armup = 6
+let armdown = 3
+let armin = 7
+let arm_out = 10
 // 
 // Each time through the forever loop all 12 keys are checked for someone pressing a key.
 // When the key is pressed the position of the servo is measured. In other words if the up/down arm key is pressed the position of the arm is measured  then 5 degrees is added to go down or subtracted to go up.
 basic.forever(function () {
-    while (input.buttonIsPressed(Button.B)) {
-        MoveServo(clawservonum, ServoBit.getServoActual(clawservonum) + 5, speed_1)
-        basic.pause(50)
+    while (read_keyboard() == ROTATE_CW) {
+        MoveServo(RotateNum, ServoBit.getServoActual(RotateNum) - 5, speed_1)
     }
-    while (input.buttonIsPressed(Button.A)) {
-        MoveServo(clawservonum, ServoBit.getServoActual(clawservonum) - 5, speed_1)
+    while (read_keyboard() == RotCCW) {
+        MoveServo(RotateNum, ServoBit.getServoActual(RotateNum) + 5, speed_1)
     }
-    while (read_keyboard() == rotate_arm_clockwise) {
-        MoveServo(rotateservonum, ServoBit.getServoActual(rotateservonum) - 5, speed_1)
+    while (read_keyboard() == armdown) {
+        MoveServo(UpDnNum, ServoBit.getServoActual(UpDnNum) - 5, speed_1)
     }
-    while (read_keyboard() == rotate_arm_counterclockwise) {
-        MoveServo(rotateservonum, ServoBit.getServoActual(rotateservonum) + 5, speed_1)
+    while (read_keyboard() == armup) {
+        MoveServo(UpDnNum, ServoBit.getServoActual(UpDnNum) + 5, speed_1)
     }
-    while (read_keyboard() == 1) {
-        MoveServo(updownservonum, ServoBit.getServoActual(updownservonum) + 5, speed_1)
+    while (read_keyboard() == armin) {
+        MoveServo(InOutNum, ServoBit.getServoActual(InOutNum) + 5, speed_1)
     }
-    while (read_keyboard() == 4) {
-        MoveServo(inoutservonum, ServoBit.getServoActual(updownservonum) + 5, speed_1)
+    while (read_keyboard() == arm_out) {
+        MoveServo(InOutNum, ServoBit.getServoActual(InOutNum) - 5, speed_1)
     }
-    while (read_keyboard() == 3) {
-        MoveServo(inoutservonum, ServoBit.getServoActual(inoutservonum) + 5, speed_1)
+    // claw close
+    while (read_keyboard() == ClawClose) {
+        MoveServo(ClawNum, ServoBit.getServoActual(ClawNum) - 5, speed_1)
     }
-    while (read_keyboard() == 6) {
-        MoveServo(inoutservonum, ServoBit.getServoActual(inoutservonum) + 5, speed_1)
-    }
-    while (read_keyboard() == clawclosing) {
-        MoveServo(clawservonum, ServoBit.getServoActual(clawservonum) - 5, speed_1)
-    }
-    while (read_keyboard() == claw_opening) {
-        MoveServo(clawservonum, ServoBit.getServoActual(clawservonum) - 5, speed_1)
+    while (read_keyboard() == ClawOpen) {
+        MoveServo(ClawNum, ServoBit.getServoActual(ClawNum) + 5, speed_1)
     }
 })
