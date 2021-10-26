@@ -1,9 +1,3 @@
-/**
- * Example is the servo that rotates the arm has a variable called rotate-servo-num. It has the value 0. So the rotate servo needs to be plugged into the "0" pins on the motor board.
- */
-/**
- * the numbers on the right side of each of these needs to be the same as the slot or connector number on the micro-bit motor board.
- */
 // This code deals with the keypad hardware. We can go over it if you want, but for now we can ignore how it works and focus on what it does.
 function read_keyboard () {
     // P0 col with zero at bottom
